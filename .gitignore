@@ -1,0 +1,4 @@
+.env
+chatapi/
+--pycache--/
+*.pyc
