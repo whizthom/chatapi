@@ -1,4 +1,5 @@
 .env
 chatapi/
---pycache--/
+__pycache__/
+.pytest_cache/
 *.pyc
