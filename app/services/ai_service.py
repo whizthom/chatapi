@@ -20,6 +20,7 @@ class AIService:
             model="gemini-3.6-flash",
             google_api_key=settings.gemini_api_key,
             max_retries=2,
+            max_output_tokens=150
         )
 
     @staticmethod
