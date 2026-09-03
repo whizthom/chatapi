@@ -19,6 +19,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+        "http://127.0.0.1:8000",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -28,6 +29,11 @@ app.add_middleware(
 
 app.include_router(chat.router)
 
+@app.get("/")
+async def home():
+    return{
+        "Message" : "Welcome to Home"
+    }
 
 @app.get("/health")
 async def health_check():

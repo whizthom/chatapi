@@ -11,6 +11,10 @@ class ChatRequest(BaseModel):
         default_factory=list,
     )
 
+    
+
+
+
 
 class ChatResponse(BaseModel):
     content: str

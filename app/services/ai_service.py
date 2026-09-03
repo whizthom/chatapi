@@ -13,6 +13,24 @@ SYSTEM_PROMPT = (
     "and use Markdown when useful."
 )
 
+PDF_WITH_INSTRUCTION_TEMPLATE = (
+    "The user uploaded a PDF document and gave the following instruction:\n"
+    '"{instruction}"\n\n'
+    "Use the PDF content below as your source and follow that instruction.\n\n"
+    "---PDF CONTENT START---\n"
+    "{pdf_text}\n"
+    "---PDF CONTENT END---"
+)
+
+PDF_SUMMARY_TEMPLATE = (
+    "The user uploaded a PDF document without any specific instruction. "
+    "Read the document below and provide a clear, well-organized summary "
+    "covering its key points, in Markdown.\n\n"
+    "---PDF CONTENT START---\n"
+    "{pdf_text}\n"
+    "---PDF CONTENT END---"
+)
+
 
 class AIService:
     def __init__(self):
@@ -20,7 +38,7 @@ class AIService:
             model="gemini-3.6-flash",
             google_api_key=settings.gemini_api_key,
             max_retries=2,
-            max_output_tokens=150
+            max_output_tokens=2048
         )
 
     @staticmethod
@@ -48,6 +66,16 @@ class AIService:
 
         return messages
 
+    @staticmethod
+    def _extract_text(response) -> str:
+        if isinstance(response.content, str):
+            return response.content
+
+        return "".join(
+            str(part)
+            for part in response.content
+        )
+
     async def generate(
         self,
         history: list[tuple[str, str]],
@@ -57,13 +85,27 @@ class AIService:
 
         response = await self.model.ainvoke(messages)
 
-        if isinstance(response.content, str):
-            return response.content
+        return self._extract_text(response)
 
-        return "".join(
-            str(part)
-            for part in response.content
-        )
+    async def generate_from_pdf(
+        self,
+        history: list[tuple[str, str]],
+        pdf_text: str,
+        instruction: str,
+    ) -> str:
+        if instruction:
+            current = PDF_WITH_INSTRUCTION_TEMPLATE.format(
+                instruction=instruction,
+                pdf_text=pdf_text,
+            )
+        else:
+            current = PDF_SUMMARY_TEMPLATE.format(pdf_text=pdf_text)
+
+        messages = self._build_messages(history, current)
+
+        response = await self.model.ainvoke(messages)
+
+        return self._extract_text(response)
 
 
 ai_service = AIService()
