@@ -10,7 +10,7 @@ settings = get_settings()
 SYSTEM_PROMPT = (
     "You are a helpful, accurate, concise AI assistant. "
     "Follow the user's instructions, explain clearly, "
-    "and use Markdown when useful."
+    # "and use Markdown when useful."
 )
 
 PDF_WITH_INSTRUCTION_TEMPLATE = (
